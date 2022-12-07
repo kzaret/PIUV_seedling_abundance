@@ -395,55 +395,65 @@ variables(rmsa.glmer.zinb2h)
 # Check models
 #--------------
 
-launch_shinystan(rmsa.glmer.zinb2h)
+mod <- rmsa.glmer.zinb2h
+
+launch_shinystan(mod)
 
 bayesplot_theme_set(ggplot2::theme_bw())
 color_scheme_set("brightblue")
 
 # posterior vs. prior
+param <- "b_log_PAR1.3.rs"
+prior_summary(mod)                  # inspect prior for param
+pdf <- function(x) dnorm(x, 0, 0.5) # density function for prior on param
 
+dev.new()
+hist(as.matrix(mod, variable = param), 25, prob = TRUE, col = "gray", border = "white", 
+     las = 1, cex.axis = 1.2, cex.lab = 1.5, cex.main = 1.5,
+     xlab = param, ylab = "Probability", main = "prior vs. posterior")
+curve(pdf(x), col = "blue", lwd = 2, add = TRUE)
 
 # density & trace plots
 dev.new()
-plot(rmsa.glmer.zinb2h)
+plot(mod)
 
 dev.new()
-mcmc_trace(rmsa.glmer.zinb2h)
+mcmc_trace(mod)
 
 ?pp_check
-pp_check(rmsa.glmer.zinb2h, ndraws = 250) + 
-  xlab("Seedling counts") + ggtitle("rmsa.glmer.zinb2h")
+pp_check(mod, ndraws = 250) + 
+  xlab("Seedling counts") + ggtitle("mod")
 
 y <- sp.rmb$PIUV_less5cmDBH_total # vector of outcome values
-yrep <- posterior_predict(rmsa.glmer.zinb2h, draws = 500) # matrix of draws from the ppd
+yrep <- posterior_predict(mod, draws = 500) # matrix of draws from the ppd
 
 prop_zero <- function(x) mean(x == 0)
 
 ppc_stat(y, yrep, stat = "prop_zero", binwidth = 0.005) +
-  ggtitle("rmsa.glmer.zinb2h")
+  ggtitle("mod")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "prop_zero", binwidth = 0.005) +
-  ggtitle("rmsa.glmer.zinb2h")
-ppc_stat(y, yrep, stat = "max", binwidth = 5) + ggtitle("rmsa.glmer.zinb2h")
+  ggtitle("mod")
+ppc_stat(y, yrep, stat = "max", binwidth = 5) + ggtitle("mod")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "max", binwidth = 5) + 
-  ggtitle("rmsa.glmer.zinb2h")
-ppc_stat(y, yrep, stat = "sd", binwidth = 5) + ggtitle("rmsa.glmer.zinb2h")
+  ggtitle("mod")
+ppc_stat(y, yrep, stat = "sd", binwidth = 5) + ggtitle("mod")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "sd", binwidth = 5) +
-  ggtitle("rmsa.glmer.zinb2h")
+  ggtitle("mod")
 
 
 # interval estimates
-get_variables(rmsa.glmer.zinb2h)
+get_variables(mod)
 dev.new()
-mcmc_intervals(rmsa.glmer.zinb2h, prob = 0.90, prob_outer = 0.95,pars=c("b_Intercept", "b_zi_Intercept", "b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog", "b_log_PAR1.3.rs:patchBogForest", "b_log_PAR1.3.rs:patchBog", "b_zi_patchBogForest", "b_zi_patchBog")) + ggtitle("rmsa.glmer.zinb2h")
+mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95,pars=c("b_Intercept", "b_zi_Intercept", "b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog", "b_log_PAR1.3.rs:patchBogForest", "b_log_PAR1.3.rs:patchBog", "b_zi_patchBogForest", "b_zi_patchBog")) + ggtitle("mod")
 
-mcmc_intervals(rmsa.glmer.zinb2h, prob = 0.90, prob_outer = 0.95, pars=c("sd_plot__Intercept", "shape","Intercept", "Intercept_zi")) + ggtitle("rmsa.glmer.zinb2h")
+mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95, pars=c("sd_plot__Intercept", "shape","Intercept", "Intercept_zi")) + ggtitle("mod")
 
 # pairwise plots
 dev.new()
-mcmc_pairs(as.matrix(rmsa.glmer.zinb2h),pars = c("b_Intercept","b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog")) + ggtitle("rmsa.glmer.zinb2h")
+mcmc_pairs(as.matrix(mod),pars = c("b_Intercept","b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog")) + ggtitle("mod")
 
 # conditional effects
-plot(conditional_effects(rmsa.glmer.zinb2h), ask = FALSE) + ggtitle("rmsa.glmer.zinb2h")
+plot(conditional_effects(mod), ask = FALSE) + ggtitle("mod")
 
 
 
