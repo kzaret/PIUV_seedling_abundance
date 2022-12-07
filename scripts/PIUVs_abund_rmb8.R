@@ -403,14 +403,18 @@ bayesplot_theme_set(ggplot2::theme_bw())
 color_scheme_set("brightblue")
 
 # posterior vs. prior
-param <- "b_log_PAR1.3.rs"
-prior_summary(mod)                  # inspect prior for param
-pdf <- function(x) dnorm(x, 0, 0.5) # density function for prior on param
+variables(rmsa.glmer.zinb2i)
+param <- "b_Intercept"
+prior_summary(rmsa.glmer.zinb2i)    # inspect prior for param
+pdf <- function(x) dnorm(x, 0, 1) # density function for prior on param
+pdf <- function(x) dgamma(x, 1, 0.1)
+pdf <- function(x) dlogis(x, 0, 1)
 
-dev.new()
-hist(as.matrix(mod, variable = param), 25, prob = TRUE, col = "gray", border = "white", 
+hist(as.matrix(rmsa.glmer.zinb2i, variable = param), 25, prob = TRUE,
+     col = "gray", border = "white", 
      las = 1, cex.axis = 1.2, cex.lab = 1.5, cex.main = 1.5,
-     xlab = param, ylab = "Probability", main = "prior vs. posterior")
+     xlim = c(0, 5),
+     xlab = param, ylab = "Probability", main = "prior vs. posterior, mod 2i")
 curve(pdf(x), col = "blue", lwd = 2, add = TRUE)
 
 # density & trace plots
