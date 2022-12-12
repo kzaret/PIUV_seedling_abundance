@@ -82,10 +82,7 @@ sp.rmb <- sp.rmb %>%
           Sphagnum.rs = as.vector(scale(Sphagnum)),
           Cushion_spp.rs = as.vector(scale(cush_spp)),
           Dicran_spp.rs = as.vector(scale(Dicran)),
-          OtherMoss_spp.rs = as.vector(scale(om)),
-          US_Emshr.rs = as.vector(scale(us_emshr)),
-          US_Shrubs.rs = as.vector(scale(us_shrubs)),
-          US_Trees.rs = as.vector(scale(us_trees)))
+          OtherMoss_spp.rs = as.vector(scale(om)))
           
 
 #verify & summarize tidied data by site
@@ -335,67 +332,52 @@ loo_compare(loo_rmsa.nbn, loo_rmsa.nb0, loo_rmsa.nb0.brm, loo_rmsa.zinb0, loo_rm
 
 
 #===============================================================================
-# Model 2 - PAR & Patch w/ interaction; explore prior specification
+# Model 2 - PAR & Patch w/ interaction; explore prior & likelihood specification
 #===============================================================================
 
-#------------
-# Fit models
-#------------
+#-----------------
+# Fit ZINB models
+#-----------------
 
-#zinb2a
-rmsa.glmer.zinb2a <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2a, file="F:/_R_objects/rmsa.glmer.zinb2a.rda")
-
-#zinb2b
-rmsa.glmer.zinb2b <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd") + set_prior ("gamma(0.5, 0.5)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2b, file="F:/_R_objects/rmsa.glmer.zinb2b.rda")
-
-#zinb2c
-rmsa.glmer.zinb2c <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd") + set_prior ("logistic(0, 0.5)", class = "Intercept", dpar="zi"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2c, file="F:/_R_objects/rmsa.glmer.zinb2c.rda")
-
-#zinb2d
-rmsa.glmer.zinb2d <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd") + set_prior ("logistic(0, 0.5)", class = "Intercept", dpar="zi") + set_prior ("gamma(0.5, 0.5)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2d, file="F:/_R_objects/rmsa.glmer.zinb2d.rda")
-
-#zinb2e
-rmsa.glmer.zinb2e <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 0.5)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 0.5)", class = "sd") + set_prior ("logistic(0, 0.5)", class = "Intercept", dpar="zi") + set_prior ("gamma(0.5, 0.5)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2e, file="F:/_R_objects/rmsa.glmer.zinb2e.rda")
-
-#zinb2f
-rmsa.glmer.zinb2f <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd") + set_prior("logistic(0,0.1)", class = "Intercept", dpar="zi"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2f, file="F:/_R_objects/rmsa.glmer.zinb2f.rda")
-
-#zinb2g
-rmsa.glmer.zinb2g <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 0.5)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 0.5)", class = "sd") + set_prior ("logistic(0, 0.1)", class = "Intercept", dpar="zi") + set_prior ("gamma(0.05, 0.05)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2g, file="F:/_R_objects/rmsa.glmer.zinb2g.rda")
-
-#zinb2h
-rmsa.glmer.zinb2h <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 0.5)", class = "sd") + set_prior ("logistic(0, 0.5)", class = "Intercept", dpar="zi") + set_prior ("gamma(0.5, 0.5)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
-save(rmsa.glmer.zinb2h, file="F:/_R_objects/rmsa.glmer.zinb2h.rda")
+#zinb2i
+rmsa.glmer.zinb2i <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(0, 1)", class = "Intercept") + set_prior("normal(0, 0.5)", class = "b") + set_prior ("normal(0, 1)", class = "sd") + set_prior ("gamma(1, 0.1)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
+save(rmsa.glmer.zinb2i, file="F:/_R_objects/rmsa.glmer.zinb2i.rda")
 
 
-load(file="F:/_R_objects/rmsa.glmer.zinb2a.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2b.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2c.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2d.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2e.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2f.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2g.rda")
-load(file="F:/_R_objects/rmsa.glmer.zinb2h.rda")
+#zinb2k
+rmsa.glmer.zinb2k <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), zi ~ patch), family = zero_inflated_negbinomial("log"), data = sp.rmb, prior = set_prior("normal(2, 3)", class = "Intercept") + set_prior("normal(0, 5)", class = "b") + set_prior ("normal(0, 5)", class = "b", dpar="zi") + set_prior ("gamma(1, 0.1)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
+save(rmsa.glmer.zinb2k, file="F:/_R_objects/rmsa.glmer.zinb2k.rda")
 
 
-prior_summary(rmsa.glmer.zinb2h)
-summary(rmsa.glmer.zinb2e)
-variables(rmsa.glmer.zinb2h)
+#-----------------
+# Fit NB models
+#-----------------
 
-?set_prior
+#nb2k 
+rmsa.glmer.nb2k <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot)), family = negbinomial("log"), data = sp.rmb, prior = set_prior("normal(2, 3)", class = "Intercept") + set_prior("normal(0, 5)", class = "b") + set_prior ("gamma(1, 0.1)", class = "shape"), iter=5000, save_pars = save_pars(all=TRUE))
+save(rmsa.glmer.nb2k, file="F:/_R_objects/rmsa.glmer.nb2k.rda")
+
+#nb2k.2 [w/ shape modeled by patch]
+rmsa.glmer.nb2k.2 <- brm(bf(PIUV_less5cmDBH_total ~ log_PAR1.3.rs + patch + log_PAR1.3.rs:patch + (1 | plot), shape ~ patch), family = negbinomial("log"), data = sp.rmb, prior = set_prior("normal(2, 3)", class = "Intercept") + set_prior("normal(0, 5)", class = "b"), iter=5000, save_pars = save_pars(all=TRUE))
+save(rmsa.glmer.nb2k.2, file="F:/_R_objects/rmsa.glmer.nb2k.2.rda")
+
+
+
+load(file="F:/_R_objects/rmsa.glmer.zinb2j.rda")
+load(file="F:/_R_objects/rmsa.glmer.zinb2k.rda")
+load(file="F:/_R_objects/rmsa.glmer.nb2k.rda")
+load(file="F:/_R_objects/rmsa.glmer.nb2k.2.rda")
+
 
 #--------------
 # Check models
 #--------------
 
-mod <- rmsa.glmer.zinb2h
+mod <- rmsa.glmer.nb2k.2
+
+prior_summary(mod)
+summary(mod)
+variables(mod)
 
 launch_shinystan(mod)
 
@@ -403,18 +385,20 @@ bayesplot_theme_set(ggplot2::theme_bw())
 color_scheme_set("brightblue")
 
 # posterior vs. prior
-variables(rmsa.glmer.zinb2i)
-param <- "b_Intercept"
-prior_summary(rmsa.glmer.zinb2i)    # inspect prior for param
-pdf <- function(x) dnorm(x, 0, 1) # density function for prior on param
+variables(mod)
+param <- "Intercept_shape"
+prior_summary(mod)    # inspect prior for param
+pdf <- function(x) dnorm(x, 0, 5) # density function for prior on param
+pdf <- function(x) dstudent_t(x, 3, 0, 2.5)
 pdf <- function(x) dgamma(x, 1, 0.1)
 pdf <- function(x) dlogis(x, 0, 1)
 
-hist(as.matrix(rmsa.glmer.zinb2i, variable = param), 25, prob = TRUE,
+hist(as.matrix(mod, variable = param), 25, prob = TRUE,
      col = "gray", border = "white", 
      las = 1, cex.axis = 1.2, cex.lab = 1.5, cex.main = 1.5,
-     xlim = c(0, 5),
-     xlab = param, ylab = "Probability", main = "prior vs. posterior, mod 2i")
+     xlim = c(-5, 5),
+     #ylim = c(0, .3)
+     xlab = param, ylab = "Probability", main = "prior vs. posterior, mod nb2k.2")
 curve(pdf(x), col = "blue", lwd = 2, add = TRUE)
 
 # density & trace plots
@@ -426,7 +410,7 @@ mcmc_trace(mod)
 
 ?pp_check
 pp_check(mod, ndraws = 250) + 
-  xlab("Seedling counts") + ggtitle("mod")
+  xlab("Seedling counts") + ggtitle("rmsa.glmer.nb2k.2")
 
 y <- sp.rmb$PIUV_less5cmDBH_total # vector of outcome values
 yrep <- posterior_predict(mod, draws = 500) # matrix of draws from the ppd
@@ -434,30 +418,31 @@ yrep <- posterior_predict(mod, draws = 500) # matrix of draws from the ppd
 prop_zero <- function(x) mean(x == 0)
 
 ppc_stat(y, yrep, stat = "prop_zero", binwidth = 0.005) +
-  ggtitle("mod")
+  ggtitle("rmsa.glmer.nb2k.2")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "prop_zero", binwidth = 0.005) +
-  ggtitle("mod")
-ppc_stat(y, yrep, stat = "max", binwidth = 5) + ggtitle("mod")
+  ggtitle("rmsa.glmer.nb2k.2")
+ppc_stat(y, yrep, stat = "max", binwidth = 5) + ggtitle("rmsa.glmer.nb2k.2")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "max", binwidth = 5) + 
-  ggtitle("mod")
-ppc_stat(y, yrep, stat = "sd", binwidth = 5) + ggtitle("mod")
+  ggtitle("rmsa.glmer.nb2k.2")
+ppc_stat(y, yrep, stat = "sd", binwidth = 5) + ggtitle("rmsa.glmer.nb2k.2")
 ppc_stat_grouped(y, yrep, sp.rmb$patch, stat = "sd", binwidth = 5) +
-  ggtitle("mod")
+  ggtitle("rmsa.glmer.nb2k.2")
 
 
 # interval estimates
 get_variables(mod)
 dev.new()
-mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95,pars=c("b_Intercept", "b_zi_Intercept", "b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog", "b_log_PAR1.3.rs:patchBogForest", "b_log_PAR1.3.rs:patchBog", "b_zi_patchBogForest", "b_zi_patchBog")) + ggtitle("mod")
+mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95,pars=c("b_Intercept", "b_zi_Intercept", "b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog", "b_log_PAR1.3.rs:patchBogForest", "b_log_PAR1.3.rs:patchBog", "b_zi_patchBogForest", "b_zi_patchBog", "sd_plot__Intercept", "shape")) + ggtitle("rmsa.glmer.nb2k.2")
 
-mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95, pars=c("sd_plot__Intercept", "shape","Intercept", "Intercept_zi")) + ggtitle("mod")
+dev.new()
+mcmc_intervals(mod, prob = 0.90, prob_outer = 0.95,pars=c("b_Intercept", "b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog", "b_log_PAR1.3.rs:patchBogForest", "b_log_PAR1.3.rs:patchBog", "sd_plot__Intercept", "b_shape_Intercept", "b_shape_patchBogForest", "b_shape_patchBog", "Intercept_shape")) + ggtitle("rmsa.glmer.nb2k.2")
 
 # pairwise plots
 dev.new()
-mcmc_pairs(as.matrix(mod),pars = c("b_Intercept","b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog")) + ggtitle("mod")
+mcmc_pairs(as.matrix(mod),pars = c("b_Intercept","b_log_PAR1.3.rs", "b_patchBogForest", "b_patchBog")) + ggtitle("rmsa.glmer.nb2k.2")
 
 # conditional effects
-plot(conditional_effects(mod), ask = FALSE) + ggtitle("mod")
+plot(conditional_effects(mod), ask = FALSE) + ggtitle("rmsa.glmer.nb2k.2")
 
 
 
